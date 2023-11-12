@@ -9,7 +9,7 @@
      - Michael Hueter: initial creation, 2018
      - Elie Schoppik: refactoring using OO, 2019
      - Joel Burton: refactored and componentized, 2020
-     - You!
+     - Frank Baiata: SBU Software Engineering 2023
   -->
 
 <html lang="en">
@@ -37,6 +37,14 @@
   <div class="navbar-brand">
     <a class="nav-link" href="#" id="nav-all">Hack or Snooze</a>
   </div>
+  <div class="main-nav-links hidden">
+    |
+    <a class="nav-link" href="#" id="nav-submit">submit</a>
+    |
+    <a class="nav-link" href="#" id="nav-favorites">favorites</a>
+    |
+    <a class="nav-link" href="#" id="nav-my-stories">my stories</a>
+  </div>
   <div class="nav-right">
     <a class="nav-link" href="#" id="nav-login">login/signup</a>
     <a class="nav-link" href="#" id="nav-user-profile"></a>
@@ -46,7 +54,24 @@
 
 <!-- area for stories (all stories, user stories, favorites) -->
 <section class="stories-container container">
+  <!-- ADDing a new story form -->
+  <form class="hidden"id="add-story-form">
+    <div>
+    <label for="add-story-title">Title:</label>
+    <input type="text" name="add-story-title" id="add-story-title" placeholder="title of the story..." required>
+    </div>
+    <div>
+    <label for="add-story-author">Author:</label>
+    <input type="text" name="add-story-author" id="add-story-author" placeholder="author of the story..." required>
+    </div>
+    <div>
+    <label for="add-story-url">URL:</label>
+    <input type="url" name="add-story-url" id="add-story-url" placeholder="URL to story page..." required>
+    </div>
+    <input type="submit" value="Post Story" id="add-story-submit">
 
+    <hr>
+  </form>
   <!-- loading message (removed by JS after stories loaded) -->
   <div id="stories-loading-msg">Loading&hellip;</div>
 

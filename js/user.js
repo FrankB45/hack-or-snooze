@@ -109,7 +109,11 @@ function saveUserCredentialsInLocalStorage() {
 
 function updateUIOnUserLogin() {
   console.debug("updateUIOnUserLogin");
+  //Turns off Login/Register UI
+  hidePageComponents();
 
+  //Setup Story Markup again to include option to favorite
+  putStoriesOnPage();
   $allStoriesList.show();
 
   updateNavOnLogin();

@@ -24,8 +24,7 @@ class Story {
   /** Parses hostname out of URL and returns it. */
 
   getHostName() {
-    // UNIMPLEMENTED: complete this function!
-    return "hostname.com";
+    return new URL(this.url).host;
   }
 }
 
@@ -69,12 +68,69 @@ class StoryList {
   /** Adds story data to API, makes a Story instance, adds it to story list.
    * - user - the current instance of User who will post the story
    * - obj of {title, author, url}
+   * 
+   * https://hack-or-snooze-v3.herokuapp.com/stories
+   * POST Request
    *
    * Returns the new Story instance
    */
 
-  async addStory( /* user, newStory */) {
-    // UNIMPLEMENTED: complete this function!
+  async addStory(user, newStory) {
+    //Get Current User Token
+    let curToken = user.loginToken;
+    console.debug(`[addStory]Current User Token: ${curToken}`);
+    //Convert data into Expected format (From API Docs)
+    let parameters = { token: curToken, story: { author: newStory.author, title: newStory.title, url: newStory.url } };
+    let queryResponse = await axios.post(`${BASE_URL}/stories`, parameters);
+
+    //Use constructor to make new Object 
+    let addedStory = new Story(queryResponse.data.story);
+
+    //Add to story lists from the beginning 
+    this.stories.unshift(addedStory);
+    user.ownStories.unshift(addedStory);
+
+    return addedStory;
+    //Expected Body  
+    //   {
+    //     "token": "YOUR_TOKEN_HERE",
+    //     "story": {
+    //       "author": "Matt Lane",
+    //       "title": "The best story ever",
+    //       "url": "http://google.com"
+    //     }
+    //   }
+    //Response 
+    // {
+    //   "story": {
+    //     "author": "Matt Lane",
+    //     "createdAt": "017-11-09T18:38:39.409Z",
+    //     "storyId": "5081e46e-3143-4c0c-bbf4-c22eb11eb3f5",
+    //     "title": "The Best Story Ever",
+    //     "updatedAt": "017-11-09T18:38:39.409Z",
+    //     "url": "https://www.rithmschool.com/blog/do-web-developers-need-to-be-good-at-math",
+    //     "username": "hueter"
+    //   }
+    // }
+  }
+
+  async removeStory(user, storyID) {
+    let curToken = user.loginToken;
+
+    let queryResponse = axios.delete(`${BASE_URL}/stories/${storyID}`, { data: { token: curToken } });
+
+    this.stories = this.stories.filter(s => {
+      return s.storyId != storyID;
+    });
+
+    user.ownStories = user.ownStories.filter(s => {
+      return s.storyId != storyID;
+    });
+
+    user.favorites = user.favorites.filter(s => {
+      return s.storyId != storyID;
+    });
+
   }
 }
 
@@ -90,13 +146,13 @@ class User {
    */
 
   constructor({
-                username,
-                name,
-                createdAt,
-                favorites = [],
-                ownStories = []
-              },
-              token) {
+    username,
+    name,
+    createdAt,
+    favorites = [],
+    ownStories = []
+  },
+    token) {
     this.username = username;
     this.name = name;
     this.createdAt = createdAt;
@@ -193,4 +249,50 @@ class User {
       return null;
     }
   }
+
+  /**API call for adding a User Favorite Story 
+   * POST
+   * https://hack-or-snooze-v3.herokuapp.com/users/username/favorites/storyId
+   * 
+   * Params:{ username: <String>, storyId: <String> }
+   * 
+   * Attributes: { token: <String> }
+   *  
+  */
+  async addStoryFavorite(story) {
+
+    //add favorite to internal favorites list
+    this.favorites.push(story)
+
+    //get current token (was not working inside axios)
+    let curToken = this.loginToken;
+    //reflect favorite change via API call
+    let queryResponse = axios.post(`${BASE_URL}/users/${this.username}/favorites/${story.storyId}`, { token: curToken });
+
+  }
+
+  /**API call for adding a User Favorite Story 
+   * DELETE
+   * https://hack-or-snooze-v3.herokuapp.com/users/username/favorites/storyId
+   * 
+   * Params:{ username: <String>, storyId: <String> }
+   * 
+   * Attributes: { token: <String> }
+   * 
+  */
+  async deleteStoryFavorite(story) {
+
+    //filter out story from internal list
+    this.favorites = this.favorites.filter(fav => {
+      return fav.storyId != story.storyId;
+    });
+
+    //get current token (was not working inside axios)
+    let curToken = this.loginToken;
+    //reflect favorite change via API call
+    let queryResponse = axios.delete(`${BASE_URL}/users/${this.username}/favorites/${story.storyId}`, { data: { token: curToken } });
+
+  }
+
+
 }

@@ -8,6 +8,7 @@
   color: gray;
   font-size: 0.8rem;
   margin: 10px 0;
+  padding: 0.5em 1em;
 }
 
 #stories-loading-msg {
@@ -32,8 +33,18 @@
 
 .story-author {
   margin-left: 2em;
+  color: forestgreen;
 }
 
 .story-user {
   display: block;
+  color: goldenrod;
+}
+.star, .trash-can {
+  font-size: 0.75rem;
+  margin: 0 2px;
+  cursor: pointer;
+}
+.trash-can:hover {
+  color: darkred;
 }
